@@ -1,5 +1,3 @@
-//crear servidor
-
 const http = require('http');
 const url = require('url');
 const fs = require('fs');
@@ -21,28 +19,43 @@ if(month < 10){
 const server = http.createServer((req, res) => {
     const params = url.parse(req.url, true).query;
     //destructuring
-    const {archivo, contenido} = params;
+    const archivo = params.archivo;
+    const contenido = params.contenido;
 
     //Crear archivo
     if (req.url.includes('/crear')) {
         fs.writeFile(`archivos/${archivo}.txt`, `Fecha:${day}-${month}-${year}. ${contenido}`, () => {
+            console.log('Archivo creado con éxito');
             res.write('Archivo creado con éxito');
             return res.end();
         });
     }
 
     //Leer un archivo
-    if (req.url.includes('/crear')) {
-        fs.writeFile(`archivos/${archivo}.txt`, (err, data) => {
-            if (err) {
-                res.write('No fue posible leer el archivo');
-                return res.end();
-            }
+    if (req.url.includes('/leer')) {
+        fs.readFile(`archivos/${archivo}.txt`, (err, data) => {
+            console.log('archivo leído');
             res.write(data);
             return res.end();
+                        
         });
     }
 
+    if (req.url.includes('/renombrar')) {
+        fs.rename(`archivos/${archivo}.txt`, `${archivo}.txt`, (err, data) => {
+            console.log('archivo renombrado');
+            res.write('archivo renombrado');
+            res.end();
+        });
+    }
+
+    if (req.url.includes('/eliminar')) {
+        fs.unlink(`archivos/${archivo}.txt`, (err,data) => {
+            console.log('Archivo eliminado');
+            res.write('Archivo eliminado');
+            res.end();
+        });
+    }
 
     //leer el index.html
     if (req.url.includes('/')) {
